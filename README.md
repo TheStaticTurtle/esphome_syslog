@@ -4,6 +4,11 @@ A simple syslog component for esphome. The component is designed to auto attach 
 
 ## How to
 
+To install, locate your `esphome` foler, create a folder named `custom_components` got into it and execute 
+```shell
+git clone https://github.com/TheStaticTurtle/esphome_syslog.git syslog
+```
+
 Simply add this to your configuration: 
 ```yaml
 syslog:

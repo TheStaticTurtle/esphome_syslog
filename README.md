@@ -14,7 +14,7 @@ Simply add this to your configuration:
 syslog:
 ```
 
-When used like this, the component will simply broadcast it's log to everyone on the network to change this beahviour you can add the `ip_address` and `port` option like this:
+When used like this, the component will simply **broadcast it's log to everyone on the network** to change this beahviour you can add the `ip_address` and `port` option like this:
 ```yaml
 syslog:
     ip_address: "192.168.1.53"

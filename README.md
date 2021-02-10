@@ -2,6 +2,8 @@
 
 A simple syslog component for esphome. The component is designed to auto attach itself to the logger core module (like the MQTT component does with the `log_topic`)
 
+This component uses the https://github.com/arcao/Syslog library version 2.0 at its core
+
 ## How to
 
 To install, locate your `esphome` folder, create a folder named `custom_components` got into it and execute 

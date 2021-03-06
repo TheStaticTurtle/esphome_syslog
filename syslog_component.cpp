@@ -34,6 +34,7 @@ void SyslogComponent::setup() {
     #ifdef USE_LOGGER
     if (logger::global_logger != nullptr) {
         logger::global_logger->add_on_log_callback([this](int level, const char *tag, const char *message) {
+            if(!this->enable_logger) return;
             if(this->strip_colors) { //Strips the "033[0;xxx" at the beginning and the "#033[0m" at the end of log messages
                 std::string org_msg(message);
                 this->log(level, tag, org_msg.substr(7, org_msg.size() -7 -4));

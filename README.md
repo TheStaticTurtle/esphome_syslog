@@ -25,6 +25,17 @@ syslog:
 
 Default behavior strips the esphome color tags from the log (The `033[0;xxx` and the `#033[0m`) if you do not want this set the `strip_colors` option to False.
 
+Default behavior also sets `enable_logger` to True if you wish to disable sending logger message and only use the `syslog.log` actino you can do so
+
+The action `syslog.log` has 3 settings:
+```yaml
+then:
+    - syslog.log:
+        level: 7
+        tag: "custom_action"
+        payload: "My log message"
+```
+
 Due to the differences in log levels of syslog and esphome I had to translate them, here is a table:
 | Esphome level                  | Syslog level |
 |--------------------------------|--------------|

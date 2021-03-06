@@ -27,16 +27,18 @@ class SyslogComponent : public Component  {
 
         void setup() override;
         void loop() override;
+  
+        void set_server_ip(const std::string &address)        { this->settings_.address   = address; }
+        void set_server_port(uint16_t port)                   { this->settings_.port      = port; }
+        void set_client_id(const std::string &client_id)      { this->settings_.client_id = client_id; }
 
-        void set_server_ip(const std::string &address)   { this->settings_.address   = address; }
-        void set_server_port(uint16_t port)              { this->settings_.port      = port; }
-        void set_client_id(const std::string &client_id) { this->settings_.client_id = client_id; }
-
+        void set_enable_logger_messages(bool en) { this->enable_logger = en; }
         void set_strip_colors(bool strip_colors) { this->strip_colors = strip_colors; }
 
         void log(uint8_t level, const std::string &tag, const std::string &payload);
     protected:
         bool strip_colors;
+        bool enable_logger;
         SYSLOGSettings settings_;
         UDP *udp_;
 };

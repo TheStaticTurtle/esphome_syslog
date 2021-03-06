@@ -3,6 +3,7 @@ import esphome.codegen as cg
 from esphome import automation
 from esphome.const import CONF_ID, CONF_IP_ADDRESS, CONF_PORT, CONF_CLIENT_ID, CONF_LEVEL, CONF_PAYLOAD, CONF_TAG
 CONF_STRIP_COLORS = "strip_colors"
+CONF_ENABLE_LOGGER_MESSAGES = "enable_logger"
 
 DEPENDENCIES = ['logger','network']
 
@@ -16,6 +17,7 @@ CONFIG_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.declare_id(SyslogComponent),
     cv.Optional(CONF_IP_ADDRESS, default="255.255.255.255"): cv.string_strict,
     cv.Optional(CONF_PORT, default=514): cv.port,
+    cv.Optional(CONF_ENABLE_LOGGER_MESSAGES, default=True): cv.boolean,
     cv.Optional(CONF_STRIP_COLORS, default=True): cv.boolean,
 })
 
@@ -32,6 +34,7 @@ def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     yield cg.register_component(var, config)
     
+    cg.add(var.set_enable_logger_messages(config[CONF_ENABLE_LOGGER_MESSAGES]))
     cg.add(var.set_strip_colors(config[CONF_STRIP_COLORS]))
     cg.add(var.set_server_ip(config[CONF_IP_ADDRESS]))
     cg.add(var.set_server_port(config[CONF_PORT]))

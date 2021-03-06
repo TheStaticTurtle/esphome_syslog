@@ -45,9 +45,9 @@ def syslog_log_action_to_code(config, action_id, template_arg, args):
     var = cg.new_Pvariable(action_id, template_arg, paren)
 
     template_ = yield cg.templatable(config[CONF_LEVEL], args, cg.uint8)
-    cg.add(var.set_topic(template_))
+    cg.add(var.set_level(template_))
     template_ = yield cg.templatable(config[CONF_TAG], args, cg.std_string)
-    cg.add(var.set_topic(template_))
+    cg.add(var.set_tag(template_))
     template_ = yield cg.templatable(config[CONF_PAYLOAD], args, cg.std_string)
     cg.add(var.set_payload(template_))
 

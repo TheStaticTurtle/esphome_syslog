@@ -1,4 +1,6 @@
 #pragma once
+#ifndef SYSLOG_COMPONENT_H_0504CB6C_15D8_4AB4_A04C_8AF9063B737F
+#define SYSLOG_COMPONENT_H_0504CB6C_15D8_4AB4_A04C_8AF9063B737F
 
 #include "esphome/core/component.h"
 #include "esphome/core/defines.h"
@@ -60,3 +62,5 @@ template<typename... Ts> class SyslogLogAction : public Action<Ts...> {
 
 }  // namespace syslog
 }  // namespace esphome
+
+#endif

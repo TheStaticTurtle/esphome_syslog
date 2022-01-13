@@ -34,7 +34,8 @@ void SyslogComponent::setup() {
     #ifdef USE_LOGGER
     if (logger::global_logger != nullptr) {
         logger::global_logger->add_on_log_callback([this](int level, const char *tag, const char *message) {
-            if(!this->enable_logger) return;
+            if(!this->enable_logger ||
+	       (level > this->settings_.min_log_level)) return;
             if(this->strip_colors) { //Strips the "033[0;xxx" at the beginning and the "#033[0m" at the end of log messages
                 std::string org_msg(message);
                 this->log(level, tag, org_msg.substr(7, org_msg.size() -7 -4));
@@ -52,17 +53,15 @@ void SyslogComponent::loop() {
 void SyslogComponent::log(uint8_t level, const std::string &tag, const std::string &payload) {
     level = level > 7 ? 7 : level;
 
-    if (level <= this->settings_.min_log_level) {
-        Syslog syslog(
-            *this->udp_,
-            this->settings_.address.c_str(),
-            this->settings_.port,
-            this->settings_.client_id.c_str(),
-            tag.c_str(),
-            LOG_KERN
-        );
-        syslog.log(esphome_to_syslog_log_levels[level],  payload.c_str());
-    }
+    Syslog syslog(
+        *this->udp_,
+        this->settings_.address.c_str(),
+        this->settings_.port,
+        this->settings_.client_id.c_str(),
+        tag.c_str(),
+        LOG_KERN
+    );
+    syslog.log(esphome_to_syslog_log_levels[level],  payload.c_str());
 }
 
 float SyslogComponent::get_setup_priority() const {

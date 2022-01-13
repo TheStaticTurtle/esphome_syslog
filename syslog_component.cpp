@@ -52,15 +52,17 @@ void SyslogComponent::loop() {
 void SyslogComponent::log(uint8_t level, const std::string &tag, const std::string &payload) {
     level = level > 7 ? 7 : level;
 
-    Syslog syslog(
-        *this->udp_,
-        this->settings_.address.c_str(),
-        this->settings_.port,
-        this->settings_.client_id.c_str(),
-        tag.c_str(),
-        LOG_KERN
-    );
-    syslog.log(esphome_to_syslog_log_levels[level],  payload.c_str());
+    if (level <= this->settings_.min_log_level) {
+        Syslog syslog(
+            *this->udp_,
+            this->settings_.address.c_str(),
+            this->settings_.port,
+            this->settings_.client_id.c_str(),
+            tag.c_str(),
+            LOG_KERN
+        );
+        syslog.log(esphome_to_syslog_log_levels[level],  payload.c_str());
+    }
 }
 
 float SyslogComponent::get_setup_priority() const {

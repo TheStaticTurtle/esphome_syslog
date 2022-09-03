@@ -11,7 +11,7 @@ To install, locate your `esphome` folder, create a folder named `custom_componen
 git clone https://github.com/TheStaticTurtle/esphome_syslog.git syslog
 ```
 
-Simply add this to your configuration: 
+Simply add this to the configuration of your esphome node: 
 ```yaml
 syslog:
 ```
@@ -23,9 +23,9 @@ syslog:
     port: 514
 ```
 
-Default behavior strips the esphome color tags from the log (The `033[0;xxx` and the `#033[0m`) if you do not want this set the `strip_colors` option to False.
+Default behavior strips the esphome color tags from the log (The `033[0;xxx` and the `#033[0m`) if you do not want this set the `strip_colors` option to `False`.
 
-Default behavior also sets `enable_logger` to True if you wish to disable sending logger message and only use the `syslog.log` actino you can do so
+Default behavior also sets `enable_logger` to `True` if you wish to disable sending logger messages and only use the `syslog.log` action you can do so by setting it to `False`:
 
 The action `syslog.log` has 3 settings:
 ```yaml
@@ -51,4 +51,4 @@ Due to the differences in log levels of syslog and esphome I had to translate th
 This table is however open to discussion as it's my interpretation, if you want to change it you can do so in the `syslog_component.cpp` file and change the array at line 22
 
 ## Warning
-This component should not break anything however if it does please open an issue. I have successfully tested this component with an esp8266 it is possible that it will not work on an esp32 but if it doesn't it should be really easy to add compatibility
+This component should not break anything and should work with everything however if it doesn't please open an issue. I have successfully tested this component with an esp8266 and an esp32.

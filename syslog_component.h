@@ -8,6 +8,7 @@
 #include "esphome/core/log.h"
 #include <Syslog.h>
 #include <Udp.h>
+#include <WiFi.h>
 #include <WiFiUdp.h>
 
 namespace esphome {
@@ -30,7 +31,7 @@ class SyslogComponent : public Component  {
 
         void setup() override;
         void loop() override;
-  
+
         void set_server_ip(const std::string &address)        { this->settings_.address   = address; }
         void set_server_port(uint16_t port)                   { this->settings_.port      = port; }
         void set_client_id(const std::string &client_id)      { this->settings_.client_id = client_id; }

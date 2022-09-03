@@ -8,7 +8,13 @@
 #include "esphome/core/log.h"
 #include <Syslog.h>
 #include <Udp.h>
-#include <WiFi.h>
+
+#if defined ESP8266 || defined ARDUINO_ESP8266_ESP01
+    #include <ESP8266WiFi.h>
+#else
+    #include <WiFi.h>
+#endif
+
 #include <WiFiUdp.h>
 
 namespace esphome {

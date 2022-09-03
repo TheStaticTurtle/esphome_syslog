@@ -51,4 +51,5 @@ Due to the differences in log levels of syslog and esphome I had to translate th
 This table is however open to discussion as it's my interpretation, if you want to change it you can do so in the `syslog_component.cpp` file and change the array at line 22
 
 ## Warning
-This component should not break anything and should work with everything however if it doesn't please open an issue. I have successfully tested this component with an esp8266 and an esp32.
+This component should not break anything and should work with everything however if it doesn't please open an issue. 
+I have successfully tested this component with an esp8266 and an esp32. BUT The esp32 seems to have issue when there is a lot of thing to send very fast which you can see turing boot when it prints the config, see [my comment in issue #7](https://github.com/TheStaticTurtle/esphome_syslog/issues/7#issuecomment-1236194816) for more details . 

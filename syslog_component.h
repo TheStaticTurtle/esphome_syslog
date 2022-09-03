@@ -44,7 +44,7 @@ class SyslogComponent : public Component  {
         bool strip_colors;
         bool enable_logger;
         SYSLOGSettings settings_;
-        UDP *udp_;
+        UDP *udp_ = NULL;
 };
 
 template<typename... Ts> class SyslogLogAction : public Action<Ts...> {

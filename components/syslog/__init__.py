@@ -16,14 +16,17 @@ syslog_ns = cg.esphome_ns.namespace('syslog')
 SyslogComponent = syslog_ns.class_('SyslogComponent', cg.Component)
 SyslogLogAction = syslog_ns.class_('SyslogLogAction', automation.Action)
 
-CONFIG_SCHEMA = cv.Schema({
-    cv.GenerateID(): cv.declare_id(SyslogComponent),
-    cv.Optional(CONF_IP_ADDRESS, default="255.255.255.255"): cv.string_strict,
-    cv.Optional(CONF_PORT, default=514): cv.port,
-    cv.Optional(CONF_ENABLE_LOGGER_MESSAGES, default=True): cv.boolean,
-    cv.Optional(CONF_STRIP_COLORS, default=True): cv.boolean,
-    cv.Optional(CONF_MIN_LEVEL, default="DEBUG"): is_log_level,
-})
+CONFIG_SCHEMA = cv.All(
+    cv.Schema({
+        cv.GenerateID(): cv.declare_id(SyslogComponent),
+        cv.Optional(CONF_IP_ADDRESS, default="255.255.255.255"): cv.string_strict,
+        cv.Optional(CONF_PORT, default=514): cv.port,
+        cv.Optional(CONF_ENABLE_LOGGER_MESSAGES, default=True): cv.boolean,
+        cv.Optional(CONF_STRIP_COLORS, default=True): cv.boolean,
+        cv.Optional(CONF_MIN_LEVEL, default="DEBUG"): is_log_level,
+    }),
+    cv.only_with_arduino,
+)
 
 SYSLOG_LOG_ACTION_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.use_id(SyslogComponent),

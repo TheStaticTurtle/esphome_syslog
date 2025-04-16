@@ -1,0 +1,310 @@
+# Complete example configuration for ESPHome with Syslog integration
+# This demonstrates all major features of the Syslog component
+
+esphome:
+  name: esp32_syslog_example
+  friendly_name: ESP32 Syslog Example
+  on_boot:
+    priority: -100
+    then:
+      - syslog.log:
+          level: 7
+          tag: "[Boot]"
+          payload: "﻿Device booted"
+      - lambda: |-
+          // Restore the filter string from the text sensor
+          id(syslog_component).set_filter_string(id(syslog_filter_text).state);
+  
+esp32:
+  board: esp32dev
+
+# Enable detailed logging
+logger:
+  level: DEBUG
+  baud_rate: 115200
+
+# WiFi configuration
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  
+  # Fallback access point
+  ap:
+    ssid: "ESP32 Syslog Demo"
+    password: "configuredevice"
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+# Enable over-the-air updates
+ota:
+  password: !secret ota_password
+
+# Web server for status page
+web_server:
+  port: 80
+
+# Add time component (useful for accurate timestamps)
+time:
+  - platform: homeassistant
+    id: homeassistant_time
+
+# Example sensors
+sensor:
+  - platform: uptime
+    name: "Uptime"
+    update_interval: 60s
+    
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    update_interval: 60s
+    
+  # Example DHT sensor
+  - platform: dht
+    pin: GPIO23
+    model: DHT22
+    temperature:
+      name: "Room Temperature"
+      id: room_temp
+    humidity:
+      name: "Room Humidity"
+      id: room_humidity
+    update_interval: 60s
+
+# Text component for filter management
+text:
+  - platform: template
+    name: "Server IP"
+    id: syslog_server_ip
+    entity_category: config
+    mode: text
+    optimistic: true
+    restore_value: true
+    initial_value: "192.168.1.100"
+    on_value:
+      - lambda: 'id(syslog_component).set_server_ip(x);'
+
+  - platform: template
+    name: "Filter Input"
+    id: syslog_filter_text
+    entity_category: config
+    optimistic: true
+    restore_value: true
+    mode: text
+    initial_value: ""   # Set an initial empty value
+    on_value:
+      then:
+        - syslog.set_filter_string:
+            filter_string: !lambda 'return x;'
+            
+number:
+  - platform: template
+    name: "Port"
+    id: syslog_server_port
+    entity_category: config
+    min_value: 1
+    max_value: 65535
+    step: 1
+    initial_value: 514
+    restore_value: true
+    optimistic: true
+    mode: box
+    on_value:
+      then:
+        - lambda: |-
+            id(syslog_component).set_server_port(x);
+    
+# Switch for enabling/disabling syslog
+switch:
+  - platform: template
+    name: "External Component Enable"
+    id: syslog_enable_switch
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    initial_value: true
+    on_turn_on:
+      - lambda: |-
+          id(syslog_component).set_globally_enabled(true);
+    on_turn_off:
+      - lambda: |-
+          id(syslog_component).set_globally_enabled(false);
+          
+  - platform: template
+    id: syslog_enable_logger
+    name: "Default Logger"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    on_turn_on:
+      - lambda: 'id(syslog_component).set_enable_logger_messages(true);'
+    on_turn_off:
+      - lambda: 'id(syslog_component).set_enable_logger_messages(false);'
+          
+  - platform: template
+    id: syslog_enable_direct_logs
+    name: "Direct Logs"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    on_turn_on:
+      - lambda: 'id(syslog_component).set_enable_direct_logs(true);'
+    on_turn_off:
+      - lambda: 'id(syslog_component).set_enable_direct_logs(false);'
+
+  - platform: template
+    id: syslog_strip_colors
+    name: "Strip Colors"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_ON
+    on_turn_on:
+      - lambda: 'id(syslog_component).set_strip_colors(true);'
+    on_turn_off:
+      - lambda: 'id(syslog_component).set_strip_colors(false);'
+
+  - platform: template
+    id: syslog_filter_mode
+    name: "Filter Mode (ON=Include/OFF=Exclude)"
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+    on_turn_on:
+      - lambda: 'id(syslog_component).set_filter_mode(true);'  # Include mode
+    on_turn_off:
+      - lambda: 'id(syslog_component).set_filter_mode(false);'  # Exclude mode
+          
+# Load syslog component from GitHub
+external_components:
+  - source:
+      type: git
+      url: https://github.com/TheStaticTurtle/esphome_syslog #need to currently be ttps://github.com/KrX3D/esphome_syslog till the PR is added
+      ref: main  # or a specific commit SHA
+    refresh: always
+
+# Syslog configuration with all available options
+syslog:
+  id: syslog_component
+  ip_address: "192.168.1.100"  # IP address of your syslog server
+  port: 514
+  client_id: esp32_living_room
+  strip_colors: true
+  enable_logger: true
+  enable_direct_logs: true
+  globally_enabled: true
+  min_level: INFO
+  filter_mode: exclude
+  filters:
+    - wifi
+    - mqtt
+    - api
+  filter_text: syslog_filter_text
+  direct_log_prefix: "direct" # Line will be output as "direct: "
+  logger_log_prefix: "logger" # Line will be output as "logger: "
+
+# Test buttons for various syslog features
+button:
+  - platform: template
+    name: "Test Syslog Message"
+    on_press:
+      - syslog.log:
+          level: 6  # INFO level
+          tag: "button"
+          payload: "Test button was pressed!"
+          
+  - platform: template
+    name: "Add WiFi Filter"
+    entity_category: config
+    on_press:
+      - syslog.add_filter:
+          tag: "wifi"
+          
+  - platform: template
+    name: "Remove WiFi Filter"
+    entity_category: config
+    on_press:
+      - syslog.remove_filter:
+          tag: "wifi"
+          
+  - platform: template
+    name: "Clear All Filters"
+    entity_category: config
+    on_press:
+      - syslog.clear_filters:
+      
+  - platform: template
+    name: "Set Standard Filters"
+    entity_category: config
+    on_press:
+      - syslog.set_filter_string:
+          filter_string: "wifi,mqtt,api"
+
+# Automatically log temperature readings
+interval:
+  - interval: 5min
+    then:
+      - lambda: |-
+          // Get current temperature and log it
+          float temp = id(room_temp).state;
+          char message[64];
+          sprintf(message, "Current temperature is %.1f°C", temp);
+          
+      - syslog.log:
+          level: 6  # INFO level
+          tag: "temp_monitor"
+          payload: !lambda 'return message;'
+
+# Log events when temperature changes significantly
+binary_sensor:
+  - platform: template
+    name: "Temperature Rise Alert"
+    lambda: |-
+      static float last_temp = 0;
+      float current_temp = id(room_temp).state;
+      bool significant_change = abs(current_temp - last_temp) > 2.0;
+      if (significant_change) {
+        last_temp = current_temp;
+      }
+      return significant_change;
+    on_press:
+      - syslog.log:
+          level: 4  # WARNING level
+          tag: "temp_alert"
+          payload: !lambda 'return "Temperature changed significantly to " + to_string(id(room_temp).state) + "°C";'
+
+select:
+  - platform: template
+    id: syslog_log_level
+    name: "Log Level"
+    entity_category: config
+    optimistic: true
+    options:
+      - "NONE"
+      - "ERROR"
+      - "WARN"
+      - "INFO"
+      - "CONFIG"
+      - "DEBUG"
+      - "VERBOSE"
+      - "VERY_VERBOSE"
+    initial_option: "DEBUG"
+    on_value:
+      - lambda: |-
+          if (x == "NONE")
+            id(syslog_component).set_min_log_level(ESPHOME_LOG_LEVEL_NONE);
+          else if (x == "ERROR")
+            id(syslog_component).set_min_log_level(ESPHOME_LOG_LEVEL_ERROR);
+          else if (x == "WARN")
+            id(syslog_component).set_min_log_level(ESPHOME_LOG_LEVEL_WARN);
+          else if (x == "INFO")
+            id(syslog_component).set_min_log_level(ESPHOME_LOG_LEVEL_INFO);
+          else if (x == "CONFIG")
+            id(syslog_component).set_min_log_level(ESPHOME_LOG_LEVEL_CONFIG);
+          else if (x == "DEBUG")
+            id(syslog_component).set_min_log_level(ESPHOME_LOG_LEVEL_DEBUG);
+          else if (x == "VERBOSE")
+            id(syslog_component).set_min_log_level(ESPHOME_LOG_LEVEL_VERBOSE);
+          else if (x == "VERY_VERBOSE")
+            id(syslog_component).set_min_log_level(ESPHOME_LOG_LEVEL_VERY_VERBOSE);

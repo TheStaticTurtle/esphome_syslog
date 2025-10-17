@@ -6,16 +6,7 @@
 #include "esphome/core/defines.h"
 #include "esphome/core/automation.h"
 #include "esphome/core/log.h"
-#include <Syslog.h>
-#include <Udp.h>
-
-#if defined ESP8266 || defined ARDUINO_ESP8266_ESP01
-    #include <ESP8266WiFi.h>
-#else
-    #include <WiFi.h>
-#endif
-
-#include <WiFiUdp.h>
+#include "esphome/components/socket/socket.h"
 
 namespace esphome {
 namespace syslog {
@@ -51,7 +42,9 @@ class SyslogComponent : public Component  {
         bool strip_colors;
         bool enable_logger;
         SYSLOGSettings settings_;
-        UDP *udp_ = NULL;
+        std::unique_ptr<socket::Socket> socket_ = nullptr;
+        struct sockaddr_storage server;
+        socklen_t server_socklen;
 };
 
 template<typename... Ts> class SyslogLogAction : public Action<Ts...> {

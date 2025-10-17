@@ -8,7 +8,7 @@ CONF_STRIP_COLORS = "strip_colors"
 CONF_ENABLE_LOGGER_MESSAGES = "enable_logger"
 CONF_MIN_LEVEL = "min_level"
 
-DEPENDENCIES = ['logger','network']
+DEPENDENCIES = ['logger','network','socket']
 
 debug_ns = cg.esphome_ns.namespace('debug')
 syslog_ns = cg.esphome_ns.namespace('syslog')
@@ -16,17 +16,14 @@ syslog_ns = cg.esphome_ns.namespace('syslog')
 SyslogComponent = syslog_ns.class_('SyslogComponent', cg.Component)
 SyslogLogAction = syslog_ns.class_('SyslogLogAction', automation.Action)
 
-CONFIG_SCHEMA = cv.All(
-    cv.Schema({
-        cv.GenerateID(): cv.declare_id(SyslogComponent),
-        cv.Optional(CONF_IP_ADDRESS, default="255.255.255.255"): cv.string_strict,
-        cv.Optional(CONF_PORT, default=514): cv.port,
-        cv.Optional(CONF_ENABLE_LOGGER_MESSAGES, default=True): cv.boolean,
-        cv.Optional(CONF_STRIP_COLORS, default=True): cv.boolean,
-        cv.Optional(CONF_MIN_LEVEL, default="DEBUG"): is_log_level,
-    }),
-    cv.only_with_arduino,
-)
+CONFIG_SCHEMA = cv.Schema({
+    cv.GenerateID(): cv.declare_id(SyslogComponent),
+    cv.Optional(CONF_IP_ADDRESS, default="255.255.255.255"): cv.string_strict,
+    cv.Optional(CONF_PORT, default=514): cv.port,
+    cv.Optional(CONF_ENABLE_LOGGER_MESSAGES, default=True): cv.boolean,
+    cv.Optional(CONF_STRIP_COLORS, default=True): cv.boolean,
+    cv.Optional(CONF_MIN_LEVEL, default="DEBUG"): is_log_level,
+})
 
 SYSLOG_LOG_ACTION_SCHEMA = cv.Schema({
     cv.GenerateID(): cv.use_id(SyslogComponent),
@@ -36,8 +33,6 @@ SYSLOG_LOG_ACTION_SCHEMA = cv.Schema({
 })
 
 def to_code(config):
-    cg.add_library('Syslog', '2.0.0')
-
     var = cg.new_Pvariable(config[CONF_ID])
     yield cg.register_component(var, config)
     
